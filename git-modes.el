@@ -10,6 +10,7 @@
 ;; Maintainer: Jonas Bernoulli <jonas@bernoul.li>
 ;; Homepage: https://github.com/magit/git-modes
 ;; Keywords: convenience vc git
+;; Package-Requires: ((emacs "25.1") (dash "2.14.1"))
 
 ;; Package-Version: 1.4.0.50-git
 ;; Package-Requires: ((emacs "25.1"))
@@ -35,8 +36,10 @@
 ;; configuration files.  The modes are:
 
 ;;    `gitattributes-mode'
-;;    `gitconfig-mode', and
-;;    `gitignore-mode'
+;;    `gitconfig-mode',
+;;    `gitignore-mode',
+;;    `git-rebase-mode',
+;;    `git-commit-mode',
 
 ;; Each mode is defined in its own library by the same name.
 ;; All additions to `auto-mode-alist' are autoloaded, so it is
@@ -47,6 +50,8 @@
 (require 'gitattributes-mode)
 (require 'gitconfig-mode)
 (require 'gitignore-mode)
+(require 'git-rebase-mode)
+(require 'git-commit-mode)
 
 (provide 'git-modes)
 
