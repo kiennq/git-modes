@@ -42,6 +42,7 @@
      (async-bytecomp-package-mode 1))
 
 (eval-when-compile (require 'recentf))
+(eval-when-compile (require 'subr-x))
 
 ;;; Options
 ;;;; Variables
@@ -116,7 +117,7 @@
 
 (defvar git-rebase-mode-map
   (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map special-mode-map)
+    (set-keymap-parent map text-mode-map)
     (define-key map (kbd "p") 'git-rebase-pick)
     (define-key map (kbd "b") 'git-rebase-break)
     (define-key map (kbd "e") 'git-rebase-edit)
@@ -132,12 +133,28 @@
     (define-key map (kbd "t") 'git-rebase-reset)
     (define-key map (kbd "x") 'git-rebase-exec)
     (define-key map (kbd "z") 'git-rebase-noop)
-    (define-key map [remap undo] 'git-rebase-undo)
     map)
   "Keymap for Git-Rebase mode.")
 
+(declare-function evil-define-key* "evil")
+(with-eval-after-load 'evil
+  (evil-define-key* 'normal git-rebase-mode-map
+    (kbd "b") 'git-rebase-break
+    (kbd "e") 'git-rebase-edit
+    (kbd "l") 'git-rebase-label
+    (kbd "MM") 'git-rebase-merge
+    (kbd "Mt") 'git-rebase-merge-toggle-editmsg
+    (kbd "m") 'git-rebase-edit
+    (kbd "f") 'git-rebase-fixup
+    (kbd "r") 'git-rebase-reword
+    (kbd "w") 'git-rebase-reword
+    (kbd "s") 'git-rebase-squash
+    (kbd "t") 'git-rebase-reset
+    (kbd "x") 'git-rebase-exec
+    (kbd "z") 'git-rebase-noop))
+
 (defvar git-rebase-command-descriptions
-  '((undo                         . "undo last change")))
+  '((git-rebase-noop . "add noop action at point")))
 
 ;;; Commands
 
@@ -432,17 +449,10 @@ equivalent behavior can be achieved with `git-rebase-edit'."
   (interactive "P")
   (git-rebase-set-bare-action "break" arg))
 
-(defun git-rebase-undo (&optional arg)
-  "Undo some previous changes.
-Like `undo' but works in read-only buffers."
-  (interactive "P")
-  (let ((inhibit-read-only t))
-    (undo arg)))
-
 ;;; Mode
 
 ;;;###autoload
-(define-derived-mode git-rebase-mode special-mode "Git Rebase"
+(define-derived-mode git-rebase-mode text-mode "Git Rebase"
   "Major mode for editing of a Git rebase file.
 
 Rebase files are generated when you run 'git rebase -i' or run
@@ -531,11 +541,13 @@ By default, this is the same except for the \"pick\" command."
               (replace-match
                (format "%-8s"
                        (mapconcat #'key-description
-                                  (--remove (eq (elt it 0) 'menu-bar)
+                                  (--remove (or (eq (elt it 0) 'menu-bar)
+                                                (eq (elt it 0) 'normal-state))
                                             (reverse (where-is-internal
                                                       cmd git-rebase-mode-map)))
                                   ", "))
-               t t nil 2))))))))
+               t t nil 2)))))
+      (set-buffer-modified-p nil))))
 
 (add-hook 'git-rebase-mode-hook 'git-rebase-mode-show-keybindings t)
 
