@@ -108,8 +108,7 @@ The major mode configured here is turned on by the minor mode
     git-commit-setup-changelog-support
     git-commit-turn-on-auto-fill
     git-commit-propertize-diff
-    bug-reference-mode
-    with-editor-usage-message)
+    bug-reference-mode)
   "Hook run at the end of `git-commit-setup'."
   :group 'git-commit
   :type 'hook
@@ -118,8 +117,7 @@ The major mode configured here is turned on by the minor mode
              git-commit-turn-on-auto-fill
              git-commit-turn-on-flyspell
              git-commit-propertize-diff
-             bug-reference-mode
-             with-editor-usage-message))
+             bug-reference-mode))
 
 (defcustom git-commit-summary-max-length 68
   "Column beyond which characters in the summary lines are highlighted.
