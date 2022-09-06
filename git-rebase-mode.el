@@ -455,10 +455,10 @@ equivalent behavior can be achieved with `git-rebase-edit'."
 (define-derived-mode git-rebase-mode text-mode "Git Rebase"
   "Major mode for editing of a Git rebase file.
 
-Rebase files are generated when you run 'git rebase -i' or run
+Rebase files are generated when you run `git rebase -i' or run
 `magit-interactive-rebase'.  They describe how Git should perform
 the rebase.  See the documentation for git-rebase (e.g., by
-running 'man git-rebase' at the command line) for details."
+running `man git-rebase' at the command line) for details."
   :group 'git-rebase
   (setq comment-start
         (or (ignore-errors
@@ -558,6 +558,7 @@ By default, this is the same except for the \"pick\" command."
 
 ;;;###autoload
 (defconst git-rebase-filename-regexp "/git-rebase-todo\\'")
+
 ;;;###autoload
 (add-to-list 'auto-mode-alist
              (cons git-rebase-filename-regexp 'git-rebase-mode))
