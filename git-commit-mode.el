@@ -76,33 +76,6 @@
   :link '(info-link "(magit)Editing Commit Messages")
   :group 'tools)
 
-;;;###autoload
-(define-minor-mode global-git-commit-mode
-  "Edit Git commit messages.
-This global mode arranges for `git-commit-setup' to be called
-when a Git commit message file is opened.  That usually happens
-when Git uses the Emacsclient as $GIT_EDITOR to have the user
-provide such a commit message."
-  :group 'git-commit
-  :type 'boolean
-  :global t
-  :init-value t
-  :initialize (lambda (symbol exp)
-                (custom-initialize-default symbol exp)
-                (when global-git-commit-mode
-                  (add-hook 'find-file-hook 'git-commit-setup-check-buffer)))
-  (if global-git-commit-mode
-      (add-hook  'find-file-hook 'git-commit-setup-check-buffer)
-    (remove-hook 'find-file-hook 'git-commit-setup-check-buffer)))
-
-(defcustom git-commit-major-mode 'text-mode
-  "Major mode used to edit Git commit messages.
-The major mode configured here is turned on by the minor mode
-`git-commit-mode'."
-  :group 'git-commit
-  :type '(choice (function-item text-mode)
-                 (const :tag "No major mode")))
-
 (defcustom git-commit-setup-hook
   '(git-commit-save-message
     git-commit-setup-changelog-support
@@ -284,16 +257,7 @@ to recover older messages")
         (major-mode 'git-commit-mode)) ; trick dir-locals-collect-variables
     (hack-dir-local-variables)
     (hack-local-variables-apply))
-  (when git-commit-major-mode
-    (let ((auto-mode-alist (list (cons (concat "\\`"
-                                               (regexp-quote buffer-file-name)
-                                               "\\'")
-                                       git-commit-major-mode)))
-          ;; The major-mode hook might want to consult these minor
-          ;; modes, while the minor-mode hooks might want to consider
-          ;; the major mode.
-          (git-commit-mode t))
-      (normal-mode t)))
+  (git-commit-mode t)
   (make-local-variable 'log-edit-comment-ring-index)
   (git-commit-mode 1)
   (git-commit-setup-font-lock)
@@ -364,7 +328,7 @@ finally check current non-comment text."
       (insert str)
       (goto-char (point-min))
       (when (re-search-forward (concat flush " -+ >8 -+$") nil t)
-        (delete-region (point-at-bol) (point-max)))
+        (delete-region (line-beginning-position) (point-max)))
       (goto-char (point-min))
       (flush-lines flush)
       (goto-char (point-max))
@@ -633,7 +597,7 @@ that expect `symbols' to look like this.  I.e. like they look in
 Elisp doc-strings, including this one.  Unlike in doc-strings,
 \"strings\" also look different than the other text."
   (setq font-lock-defaults '(git-commit-elisp-text-mode-keywords))
-  (or global-git-commit-mode (global-git-commit-mode)))
+  (git-commit-setup))
 
 (defvar git-commit-elisp-text-mode-keywords
   `((,(concat "[`‘]\\(" lisp-mode-symbol-regexp "\\)['’]")
