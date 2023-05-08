@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       upstream_repo: magit/git-modes
-      upstream_branch: master
+      upstream_branch: main
     steps:
       - uses: actions/checkout@v2
         with:
@@ -27,7 +27,7 @@ jobs:
           git fetch upstream $upstream_branch --depth=400
       - name: Sync
         run: |
-          git config --global user.email "github-actions[bot]"
-          git config --global user.name "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git rebase --autosquash --autostash upstream/$upstream_branch
           git push origin -f
