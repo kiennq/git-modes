@@ -121,7 +121,7 @@
     (define-key map (kbd "p") 'git-rebase-pick)
     (define-key map (kbd "b") 'git-rebase-break)
     (define-key map (kbd "e") 'git-rebase-edit)
-    (define-key map (kbd "l") 'git-rebase-label)
+    (define-key map (kbd "L") 'git-rebase-label)
     (define-key map (kbd "MM") 'git-rebase-merge)
     (define-key map (kbd "Mt") 'git-rebase-merge-toggle-editmsg)
     (define-key map (kbd "m") 'git-rebase-edit)
@@ -131,7 +131,7 @@
     (define-key map (kbd "w") 'git-rebase-reword)
     (define-key map (kbd "s") 'git-rebase-squash)
     (define-key map (kbd "t") 'git-rebase-reset)
-    (define-key map (kbd "x") 'git-rebase-exec)
+    (define-key map (kbd "X") 'git-rebase-exec)
     (define-key map (kbd "z") 'git-rebase-noop)
     map)
   "Keymap for Git-Rebase mode.")
@@ -141,7 +141,7 @@
   (evil-define-key* 'normal git-rebase-mode-map
     (kbd "b") 'git-rebase-break
     (kbd "e") 'git-rebase-edit
-    (kbd "l") 'git-rebase-label
+    (kbd "L") 'git-rebase-label
     (kbd "MM") 'git-rebase-merge
     (kbd "Mt") 'git-rebase-merge-toggle-editmsg
     (kbd "m") 'git-rebase-edit
@@ -150,7 +150,7 @@
     (kbd "w") 'git-rebase-reword
     (kbd "s") 'git-rebase-squash
     (kbd "t") 'git-rebase-reset
-    (kbd "x") 'git-rebase-exec
+    (kbd "X") 'git-rebase-exec
     (kbd "z") 'git-rebase-noop))
 
 (defvar git-rebase-command-descriptions
@@ -189,13 +189,13 @@
   '((?b . "break")
     (?e . "edit")
     (?f . "fixup")
-    (?l . "label")
+    (?L . "label")
     (?m . "merge")
     (?p . "pick")
     (?r . "reword")
     (?s . "squash")
     (?t . "reset")
-    (?x . "exec"))
+    (?X . "exec"))
   "Alist mapping single key of an action to the full name.")
 
 (defclass git-rebase-action ()
@@ -243,16 +243,16 @@ If the current line isn't recognized as a rebase line, an
 instance with all nil values is returned."
   (save-excursion
     (goto-char (line-beginning-position))
-    (if-let ((re-start (concat "^\\(?5:" (regexp-quote comment-start)
-                               "\\)? *"))
-             (type (-some (lambda (arg)
-                            (let ((case-fold-search nil))
-                              (and (looking-at (concat re-start (cdr arg)))
-                                   (car arg))))
-                          git-rebase-line-regexps)))
+    (if-let* ((re-start (concat "^\\(?5:" (regexp-quote comment-start)
+                                "\\)? *"))
+              (type (-some (lambda (arg)
+                             (let ((case-fold-search nil))
+                               (and (looking-at (concat re-start (cdr arg)))
+                                    (car arg))))
+                           git-rebase-line-regexps)))
         (git-rebase-action
          :action-type    type
-         :action         (when-let ((action (match-string-no-properties 1)))
+         :action         (when-let* ((action (match-string-no-properties 1)))
                            (or (cdr (assoc action git-rebase-short-options))
                                action))
          :action-options (match-string-no-properties 2)
